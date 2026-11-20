@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { headers } from "next/headers";
-import { supabaseServer } from "@/lib/supabase/server";
+import { isSupabaseConfigured, supabaseServer } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/rateLimit";
 
 const creds = z.object({
@@ -17,6 +17,7 @@ async function ip() {
 const fail = (path: string, msg: string) => redirect(`${path}?error=${encodeURIComponent(msg)}`);
 
 export async function signUp(formData: FormData) {
+  if (!isSupabaseConfigured()) fail("/register", "Account registration is unavailable until Supabase is configured.");
   if (!rateLimit(`signup:${await ip()}`, 5, 15 * 60_000)) fail("/register", "Too many attempts. Try later.");
   const parsed = creds.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) fail("/register", parsed.error.issues[0].message);
@@ -31,6 +32,7 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signIn(formData: FormData) {
+  if (!isSupabaseConfigured()) fail("/login", "Login is unavailable until Supabase is configured.");
   if (!rateLimit(`login:${await ip()}`, 10, 15 * 60_000)) fail("/login", "Too many attempts. Try later.");
   const parsed = creds.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) fail("/login", "Invalid email or password.");
