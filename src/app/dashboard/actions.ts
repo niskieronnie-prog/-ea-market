@@ -7,14 +7,18 @@ import { requireRole } from "@/lib/auth";
 
 const back = (msg: string, ok = false) => redirect(`/dashboard?${ok ? "message" : "error"}=${encodeURIComponent(msg)}`);
 
-export async function requestRole(formData: FormData) {
+export async function activateRole(formData: FormData) {
   const user = await requireRole(["customer"]);
   const role = z.enum(["affiliate", "seller"]).safeParse(formData.get("role"));
   if (!role.success) back("Invalid role");
   const supabase = await supabaseServer();
-  const { error } = await supabase.from("role_requests").insert({ user_id: user.id, requested_role: role.data! });
-  if (error) back("You already have a pending request.");
-  back("Request submitted. An administrator will review it.", true);
+  const { error } = await supabase.rpc("set_self_service_role", { p_role: role.data! });
+  if (error) {
+    console.error("Could not activate self-service role:", error);
+    back("Could not activate this role. Please try again.");
+  }
+  revalidatePath("/dashboard");
+  back(`Your ${role.data === "seller" ? "seller" : "affiliate marketer"} access is active.`, true);
 }
 
 export async function createBusiness(formData: FormData) {

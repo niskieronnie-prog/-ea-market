@@ -3,7 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/money";
 import Link from "next/link";
 import { ProductImageUploader, VerificationUploader } from "@/components/Uploaders";
-import { requestRole, createBusiness, createProduct, createAffiliateLink } from "./actions";
+import { activateRole, createBusiness, createProduct, createAffiliateLink } from "./actions";
 export const metadata = { title: "Dashboard", robots: { index: false } };
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ error?: string; message?: string }> }) {
@@ -18,7 +18,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       {message && <p role="status">{message}</p>}
       {error && <p role="alert" className="error">{error}</p>}
 
-      {user.role === "customer" && await CustomerPanel()}
+      {user.role === "customer" && <CustomerPanel />}
       {user.role === "seller" && await SellerPanel()}
       {user.role === "affiliate" && await AffiliatePanel()}
       {user.role === "seller" && <p><Link href="/dashboard/campaigns">Manage campaigns</Link></p>}
@@ -27,17 +27,16 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     </>
   );
 
-  async function CustomerPanel() {
-    const { data: reqs } = await supabase.from("role_requests").select("requested_role,status,created_at").order("created_at", { ascending: false });
+  function CustomerPanel() {
     return (
       <div className="card">
-        <h2>Request marketer or seller access</h2>
-        <form action={requestRole}>
+        <h2>Become a seller or affiliate marketer</h2>
+        <p className="muted">Access activates immediately. Seller businesses and product listings still require review before they appear publicly.</p>
+        <form action={activateRole}>
           <label htmlFor="role">I want to be a</label>
           <select id="role" name="role"><option value="affiliate">Affiliate marketer</option><option value="seller">Seller / business</option></select>
-          <p><button className="btn">Submit request</button></p>
+          <p><button className="btn">Activate access</button></p>
         </form>
-        {reqs?.length ? <ul>{reqs.map((r, i) => <li key={i}>{r.requested_role}: {r.status}</li>)}</ul> : null}
       </div>
     );
   }

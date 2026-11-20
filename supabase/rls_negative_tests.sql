@@ -11,7 +11,7 @@ rollback;
 -- 2. Customer cannot call admin functions
 begin; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"<CUSTOMER_UUID>","role":"authenticated"}',true);
-select decide_role_request(gen_random_uuid(), true);            -- EXPECT ERROR: forbidden
+select decide_role_request(gen_random_uuid(), true);            -- EXPECT ERROR: permission denied
 select set_commission_status(gen_random_uuid(), 'paid');        -- EXPECT ERROR: forbidden
 select decide_payout(gen_random_uuid(), 'paid', 'x');           -- EXPECT ERROR: forbidden
 select process_deletion(gen_random_uuid(), true);               -- EXPECT ERROR: forbidden
@@ -53,3 +53,20 @@ rollback;
 
 -- 8. Audit log is append-only (run as the SQL editor owner)
 -- update audit_log set action='x';   -- EXPECT ERROR: audit_log is append-only
+
+-- 9. A customer can self-activate only seller or affiliate access.
+begin; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"<CUSTOMER_UUID>","role":"authenticated"}',true);
+select set_self_service_role('seller');
+select role from profiles where id='<CUSTOMER_UUID>';            -- EXPECT seller
+rollback;
+
+begin; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"<CUSTOMER_UUID>","role":"authenticated"}',true);
+select set_self_service_role('admin');                           -- EXPECT ERROR: invalid role
+rollback;
+
+begin; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"<SELLER_UUID>","role":"authenticated"}',true);
+select set_self_service_role('affiliate');                       -- EXPECT ERROR: only customer accounts can select a role
+rollback;

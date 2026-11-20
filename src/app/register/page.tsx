@@ -7,7 +7,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
   return (
     <div className="card" style={{ maxWidth: 420, margin: "0 auto" }}>
       <h1>Create account</h1>
-      <p className="muted">Everyone starts as a customer. You can request marketer or seller access from your dashboard; an administrator reviews it.</p>
+      <p className="muted">Everyone starts as a customer. Choose seller or affiliate marketer access from your dashboard to activate it immediately. Seller businesses and listings still require review before going public.</p>
       {error && <p role="alert" className="error">{error}</p>}
       <form action={signUp}>
         <label htmlFor="email">Email</label>

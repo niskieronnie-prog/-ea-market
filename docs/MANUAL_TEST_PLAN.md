@@ -2,7 +2,8 @@
 Mark each line only after you actually ran it. Use 4 test accounts: customer, seller, affiliate, admin.
 
 ## Roles & isolation
-- [ ] New sign-up is `customer`. Request seller; admin approves; role changes on next page load.
+- [ ] New sign-up is `customer`. Self-activate seller or affiliate access; the selected role is active immediately without admin approval.
+- [ ] A customer cannot activate support/admin or directly update their profile role.
 - [ ] Seller A cannot see Seller B's enquiries (log in as each; check dashboard).
 - [ ] Customer visiting /admin, /admin/finance is redirected with "Not authorized".
 - [ ] `supabase/rls_negative_tests.sql` blocks all pass.

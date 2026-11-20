@@ -3,7 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { allIntegrationStatuses } from "@/lib/providers";
 import Link from "next/link";
 import VerificationDocs from "@/components/VerificationDocs";
-import { decideRole, moderateProduct, verifyBusiness } from "./actions";
+import { moderateProduct, verifyBusiness } from "./actions";
 import { sendQueuedEmails, refreshRates } from "./ops-actions";
 import { emailConfigured } from "@/lib/email";
 export const metadata = { title: "Admin", robots: { index: false } };
@@ -11,8 +11,7 @@ export const metadata = { title: "Admin", robots: { index: false } };
 export default async function Admin() {
   await requireRole(["admin"]);
   const supabase = await supabaseServer();
-  const [{ data: reqs }, { data: prods }, { data: biz }, users, prodCount, clicks] = await Promise.all([
-    supabase.from("role_requests").select("id,requested_role,status,profiles(email)").eq("status", "pending"),
+  const [{ data: prods }, { data: biz }, users, prodCount, clicks] = await Promise.all([
     supabase.from("products").select("id,title,price_minor,currency").eq("status", "pending"),
     supabase.from("businesses").select("id,name,owner_id,verification_status").neq("verification_status", "verified"),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
@@ -32,15 +31,6 @@ export default async function Admin() {
         <div className="card"><strong>{clicks.count ?? 0}</strong><br />Recorded clicks</div>
       </div>
       <p className="muted">Counts come from the live database and include any test data.</p>
-
-      <h2>Role requests</h2>
-      {reqs?.length ? reqs.map((r) => (
-        <form key={r.id} action={decideRole} className="card" style={{ marginBottom: 8 }}>
-          <input type="hidden" name="id" value={r.id} />
-          {(r.profiles as unknown as { email?: string } | null)?.email} wants <strong>{r.requested_role}</strong>{" "}
-          <Btn name="approve" value="true" label="Approve" /> <Btn name="approve" value="false" label="Reject" />
-        </form>
-      )) : <p className="muted">None pending.</p>}
 
       <h2>Businesses awaiting verification</h2>
       {biz?.length ? biz.map((b) => (

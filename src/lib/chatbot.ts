@@ -2,8 +2,8 @@
 export type ChatResult = { reply: string; escalate: boolean; searchTerm?: string; unknown?: boolean };
 
 const FAQ: { match: RegExp; answer: string }[] = [
-  { match: /affiliate|commission|earn/i, answer: "Marketers can apply for affiliate access from their dashboard. Commissions are only created from verified conversions, never from clicks alone, and are approved by an administrator. No income is guaranteed." },
-  { match: /sell|seller|business|list/i, answer: "Businesses register a seller account (approved by an administrator), add a business profile, and submit products. Listings are reviewed before they go public." },
+  { match: /affiliate|commission|earn/i, answer: "Marketers can activate affiliate access from their dashboard immediately. Commissions are only created from verified conversions, never from clicks alone, and are approved by an administrator. No income is guaranteed." },
+  { match: /sell|seller|business|list/i, answer: "Anyone can activate seller access from their dashboard immediately. Businesses and product listings are still reviewed before they go public." },
   { match: /ship|deliver/i, answer: "Shipping and delivery are set by each merchant and may not cover every country. Please confirm at the merchant's checkout." },
   { match: /refund|return/i, answer: "Refunds and returns are handled by the merchant that sold the item. We do not control third-party purchases. See the Refund & Returns page." },
   { match: /privacy|data|delete/i, answer: "See our Privacy Policy. You can request deletion of your personal data by contacting support." },
