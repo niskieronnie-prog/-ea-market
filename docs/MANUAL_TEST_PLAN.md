@@ -2,6 +2,9 @@
 Mark each line only after you actually ran it. Use 4 test accounts: customer, seller, affiliate, admin.
 
 ## Roles & isolation
+- [ ] Sign-up with email confirmation enabled sends a valid verification link; confirm it and sign in.
+- [ ] With email confirmation disabled, successful sign-up creates a session and opens the dashboard.
+- [ ] Sign-in accepts existing passwords shorter than the sign-up minimum, if such accounts exist.
 - [ ] New sign-up is `customer`. Self-activate seller or affiliate access; the selected role is active immediately without admin approval.
 - [ ] A customer cannot activate support/admin or directly update their profile role.
 - [ ] Seller A cannot see Seller B's enquiries (log in as each; check dashboard).

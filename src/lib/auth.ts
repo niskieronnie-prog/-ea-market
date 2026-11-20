@@ -10,7 +10,11 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  const { data: profile } = await supabase.from("profiles").select("role, full_name, email").eq("id", user.id).single();
+  const { data: profile, error } = await supabase.from("profiles").select("role, full_name, email").eq("id", user.id).single();
+  if (error) {
+    console.error("Supabase profile lookup failed:", { code: error.code, message: error.message });
+    return null;
+  }
   if (!profile) return null;
   return { id: user.id, email: profile.email, role: profile.role as Role, fullName: profile.full_name };
 }
