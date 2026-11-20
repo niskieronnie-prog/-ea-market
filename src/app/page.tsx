@@ -1,12 +1,8 @@
 import Link from "next/link";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 export default function Home() {
   return (
     <>
-      {!isSupabaseConfigured() && (
-        <div className="notice" role="alert"><strong>Setup required:</strong> Supabase is not configured yet. Follow README.md step 3 to enable accounts and products.</div>
-      )}
       <section className="hero">
         <h1>Find products. Reach customers. Earn transparently.</h1>
         <p>A marketplace for East Africa where shoppers discover products, businesses publish listings and receive consent-based enquiries, and approved marketers promote with trackable links.</p>
