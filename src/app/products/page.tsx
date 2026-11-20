@@ -5,7 +5,7 @@ import { getDisplayCurrency, getRates, indicative } from "@/lib/currency";
 export const metadata = { title: "Products", description: "Browse published product listings." };
 
 export default async function Products({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
-  if (!isSupabaseConfigured()) return <div className="notice">Setup required: connect Supabase (see README).</div>;
+  if (!isSupabaseConfigured()) return <div className="notice">Product listings are currently unavailable.</div>;
   const { q = "", page = "1" } = await searchParams;
   const pageNum = Math.max(1, parseInt(page) || 1);
   const size = 12;
