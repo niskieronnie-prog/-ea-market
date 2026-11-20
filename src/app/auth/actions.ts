@@ -18,6 +18,8 @@ const fail = (path: string, msg: string) => redirect(`${path}?error=${encodeURIC
 
 export async function signUp(formData: FormData) {
   if (!isSupabaseConfigured()) fail("/register", "Account registration is unavailable until Supabase is configured.");
+  const siteUrl = z.string().url().safeParse(process.env.NEXT_PUBLIC_SITE_URL);
+  if (!siteUrl.success) fail("/register", "Account registration is unavailable until the site URL is configured.");
   if (!rateLimit(`signup:${await ip()}`, 5, 15 * 60_000)) fail("/register", "Too many attempts. Try later.");
   const parsed = creds.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) fail("/register", parsed.error.issues[0].message);
@@ -25,9 +27,12 @@ export async function signUp(formData: FormData) {
   const supabase = await supabaseServer();
   const { error } = await supabase.auth.signUp({
     ...parsed.data!,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` },
+    options: { emailRedirectTo: new URL("/auth/callback", siteUrl.data).toString() },
   });
-  if (error) fail("/register", "Could not create account. Please check your details.");
+  if (error) {
+    console.error("Supabase sign-up failed:", { status: error.status, code: error.code, message: error.message });
+    fail("/register", "Could not create account. Please check your details or try again later.");
+  }
   redirect("/login?message=" + encodeURIComponent("Check your email to verify your account, then log in."));
 }
 
@@ -38,7 +43,10 @@ export async function signIn(formData: FormData) {
   if (!parsed.success) fail("/login", "Invalid email or password.");
   const supabase = await supabaseServer();
   const { error } = await supabase.auth.signInWithPassword(parsed.data!);
-  if (error) fail("/login", "Invalid email or password.");   // same message: no account enumeration
+  if (error) {
+    console.error("Supabase sign-in failed:", { status: error.status, code: error.code, message: error.message });
+    fail("/login", "Invalid email or password.");   // same message: no account enumeration
+  }
   redirect("/dashboard");
 }
 
