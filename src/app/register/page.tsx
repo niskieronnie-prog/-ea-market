@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signUp } from "@/app/auth/actions";
+import PasswordField from "@/components/PasswordField";
 export const metadata = { title: "Sign up" };
 
 export default async function Register({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
@@ -13,7 +14,7 @@ export default async function Register({ searchParams }: { searchParams: Promise
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" autoComplete="email" required />
         <label htmlFor="password">Password (10+ characters)</label>
-        <input id="password" name="password" type="password" autoComplete="new-password" minLength={10} required />
+        <PasswordField id="password" name="password" autoComplete="new-password" minLength={10} required />
         <label style={{ fontWeight: 400 }}><input type="checkbox" name="terms" style={{ width: "auto" }} required /> I accept the <Link href="/legal/terms">Terms</Link> and <Link href="/legal/privacy">Privacy Policy</Link>.</label>
         <p><button className="btn">Sign up</button></p>
       </form>
